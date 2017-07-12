@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Result</title>
+
+
+    <style>
+table, th, td {
+    border: 1px solid black;
+}
+</style>
+</head>
+<body>
+        <center>
+            <table style="width:30%">
+                    <tr>
+                        <th>Good</th>
+                        <th>Normal</th>
+                        <th>Bad</th>
+                    </tr>
+
+                    <tr>
+                        {% for i in result %}
+                        <td>{{i}}</td>
+                        {%endfor%}
+                    </tr>
+
+            </table>
+
+        </center>
