@@ -1,8 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, stream_with_context, Response
-from app import app
-import time
-
-out = [0, 0, 0]
+from flask import render_template, request, stream_with_context, Response
+from app import app, db
+from app.model import Table
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -15,16 +13,18 @@ def index():
             yield render_template('thanks.html')
 
         if request.form['submit'] == 'good':
-            global out
-            out[0] += 1
+            # Table.query.filter_by(level='good').update({'value':0})
+            Table.query.filter_by(level='good').first().value += 1
+            db.session.commit()
+
             return Response(stream_with_context(generate()))
         elif request.form['submit'] == 'normal':
-            global out
-            out[1] += 1
+            Table.query.filter_by(level='normal').first().value += 1
+            db.session.commit()
             return Response(stream_with_context(generate()))
         elif request.form['submit'] == 'bad':
-            global out
-            out[2] += 1
+            Table.query.filter_by(level='bad').first().value += 1
+            db.session.commit()
             return Response(stream_with_context(generate()))
 
     return render_template('index.html')
@@ -37,4 +37,10 @@ def thanks():
 
 @app.route('/result', methods=['GET', 'POST'])
 def result():
+
+    out = [0, 0, 0]
+    out[0] = Table.query.filter_by(level='good').first().value
+    out[1] = Table.query.filter_by(level='normal').first().value
+    out[2] = Table.query.filter_by(level='bad').first().value
+
     return render_template('result.html', result=out)
