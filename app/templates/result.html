@@ -13,19 +13,33 @@ table, th, td {
 </head>
 <body>
         <center>
+
+            <!--<form action="" name="Choice">-->
+                <!--<input type="submit" value="Поиск">-->
+                <!--<input value="good, normal, bad">-->
+            <!--</form>-->
+
+            <!--<br>-->
+
             <table style="width:30%">
-                    <tr>
-                        <th>Good</th>
-                        <th>Normal</th>
-                        <th>Bad</th>
-                    </tr>
+                    <!--<tr>-->
+                        <!--<th>Локация</th>-->
+                        <!--<th>Статус</th>-->
+                        <!--<th>Дата</th>-->
+                    <!--</tr>-->
 
                     <tr>
                         {% for i in result %}
-                        <td>{{i}}</td>
+                        <tr>
+                        {% for j in i %}
+                        <td>{{j}}</td>
+                        {%endfor%}
+                    <tr>
                         {%endfor%}
                     </tr>
 
             </table>
+
+
 
         </center>

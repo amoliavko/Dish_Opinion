@@ -1,33 +1,53 @@
 from flask import render_template, request, stream_with_context, Response
 from app import app, db
 from app.model import Table
+from datetime import datetime
 
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
+def db_filter(location, rating):
+    db.session.add(Table(location=location, rating=rating, data=datetime.now()))
+    # Table.query.filter_by(level='good').update({'value':0})
 
+
+@app.route('/office', methods=['GET', 'POST'])
+def office():
     if request.method =='POST':
-
         def generate():
             # yield request.args['name']
             yield render_template('thanks.html')
 
         if request.form['submit'] == 'good':
-            # Table.query.filter_by(level='good').update({'value':0})
-            Table.query.filter_by(level='good').first().value += 1
-            db.session.commit()
+            db_filter('office', 'good')
 
-            return Response(stream_with_context(generate()))
         elif request.form['submit'] == 'normal':
-            Table.query.filter_by(level='normal').first().value += 1
-            db.session.commit()
-            return Response(stream_with_context(generate()))
-        elif request.form['submit'] == 'bad':
-            Table.query.filter_by(level='bad').first().value += 1
-            db.session.commit()
-            return Response(stream_with_context(generate()))
+            db_filter('office', 'normal')
 
-    return render_template('index.html')
+        elif request.form['submit'] == 'bad':
+            db_filter('office', 'bad')
+
+        db.session.commit()
+        return Response(stream_with_context(generate()))
+    return render_template('office.html')
+
+
+@app.route('/kitchen', methods=['GET', 'POST'])
+def kitchen():
+    if request.method =='POST':
+        def generate():
+            yield render_template('thanks.html')
+
+        if request.form['submit'] == 'good':
+            db_filter('kitchen', 'good')
+
+        elif request.form['submit'] == 'normal':
+            db_filter('kitchen', 'normal')
+
+        elif request.form['submit'] == 'bad':
+            db_filter('kitchen', 'bad')
+
+        db.session.commit()
+        return Response(stream_with_context(generate()))
+    return render_template('kitchen.html')
 
 
 @app.route('/thanks', methods=['GET', 'POST'])
@@ -38,9 +58,13 @@ def thanks():
 @app.route('/result', methods=['GET', 'POST'])
 def result():
 
-    out = [0, 0, 0]
-    out[0] = Table.query.filter_by(level='good').first().value
-    out[1] = Table.query.filter_by(level='normal').first().value
-    out[2] = Table.query.filter_by(level='bad').first().value
+    # out = Table.query.filter_by(rating='normal').first().data
+    # out = Table.query.filter_by(rating='bad').count()
+    # for i in Table.query.filter_by(rating='good'):
+    #     out.append(i.data)
+    # out = [r for r in db.session.query(Table.location)]
+    out = []
+    for i in db.session.query(Table).all():
+        out.append(i.__dict__.values())
 
     return render_template('result.html', result=out)
